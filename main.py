@@ -6,6 +6,8 @@ from src.train import train_model
 import torch
 from torch.nn import CrossEntropyLoss
 from torch.optim import AdamW
+import neptune
+import os
 
 with open(DATA_PATH, 'r', encoding='utf-8') as f:
     text = f.read()
@@ -22,11 +24,7 @@ train_dataset, val_dataset = random_split(fulldataset, [train_size, val_size])
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-
 x, y = next(iter(train_loader))
-print("Input batch shape:", x.shape)
-print("Target batch shape:", y.shape)
-print("Example decoded input:", tokenizer.decode(x[0].tolist()))
 
 model = MiniTransformer(
     vocab_size=tokenizer.vocab_size,
@@ -42,4 +40,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 loss_fn = CrossEntropyLoss()
 optimizer = AdamW(model.parameters(), lr=LEARNING_RATE)
 
-train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, device)
+run = neptune.init_run(
+    project="Rishabh-Singh/Transformer-Scratch",
+    api_token=os.getenv("NEPTUNE_API_TOKEN"),
+)
+
+train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, device, run)

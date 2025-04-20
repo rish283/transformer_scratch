@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
-def train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, device):
+def train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, device, run=None):
     model = model.to(device)
     best_val_loss = float('inf')
     best_model = None
@@ -23,6 +23,8 @@ def train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, dev
             loss.backward()
             optimizer.step()
             total_loss += loss.item()
+            if run:
+                run["train/batch/loss"].append(loss.item())
         avg_train_loss = total_loss / len(train_loader)
         print(f"Epoch {epoch+1}/{EPOCHS}, Train Loss: {avg_train_loss:.4f}")
 
@@ -38,13 +40,29 @@ def train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, dev
                 y = y.view(B * T)
                 val_loss = loss_fn(logits, y)
                 total_val_loss += val_loss.item()
+                if run:
+                    run["val/batch/loss"].append(loss.item())
         avg_val_loss = total_val_loss / len(val_loader)
         print(f"Epoch {epoch+1}/{EPOCHS}, Validation Loss: {avg_val_loss:.4f}")
-        # Save the best model
-        if avg_val_loss < best_val_loss:
-            best_val_loss = avg_val_loss
-            best_model = model.state_dict()
-            print(f"Best model saved at epoch {epoch+1} with validation loss: {best_val_loss:.4f}")
-    # Save the best model to a file
-    torch.save(best_model, 'best_model.pth')
-    print("Training complete. Best model saved.")
+
+        if run:
+            run["train/epoch/loss"].append(avg_train_loss)
+            run["val/epoch/loss"].append(avg_val_loss)
+
+        # save model every 4 epochs
+
+        if (epoch + 1) % 4 == 0:
+            torch.save(model.state_dict(), f"model_epoch_{epoch+1}.pth")
+            print(f"Model saved at epoch {epoch+1}")
+
+        # # Save the best model
+        # if avg_val_loss < best_val_loss:
+        #     best_val_loss = avg_val_loss
+        #     best_model = model.state_dict()
+        #     print(f"Best model saved at epoch {epoch+1} with validation loss: {best_val_loss:.4f}")
+    
+        # # Save the best model to a file
+        # torch.save(best_model, 'best_model.pth')
+        print("Training complete.")
+    
+    run.stop()
