@@ -4,7 +4,7 @@ import torch.optim as optim
 from tqdm import tqdm
 
 def train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, device, run=None):
-    model = model.to(device)
+    print("Device:", next(model.parameters()).device)
     best_val_loss = float('inf')
     best_model = None
 
@@ -52,7 +52,7 @@ def train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, dev
         # save model every 4 epochs
 
         if (epoch + 1) % 4 == 0:
-            torch.save(model.state_dict(), f"model_epoch_{epoch+1}.pth")
+            torch.save(model.state_dict(), f"outputs/checkpoints/model_epoch_{epoch+1}.pth")
             print(f"Model saved at epoch {epoch+1}")
 
         # # Save the best model

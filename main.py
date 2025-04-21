@@ -1,5 +1,5 @@
 from src.dataset import TinyShakespeareTokenizer, TinyShakespeareDataset
-from src.config import SEQ_LEN, BATCH_SIZE, DATA_PATH, LEARNING_RATE, EPOCHS
+from src.config import SEQ_LEN, BATCH_SIZE, DATA_PATH, LEARNING_RATE, EPOCHS, CHEKPOINT_PATH
 from torch.utils.data import DataLoader, random_split
 from src.model import MiniTransformer
 from src.train import train_model
@@ -34,8 +34,14 @@ model = MiniTransformer(
     n_layers = 4,
 )
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+os.makedirs(CHEKPOINT_PATH, exist_ok=True)
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("PyTorch version:", torch.__version__)
+print("CUDA available:", torch.cuda.is_available())
+print("CUDA version PyTorch built with:", torch.version.cuda)
+print("CUDA version available from system:", torch.version.cuda)
+model = model.to(device)
 #define loss function and optimizer
 loss_fn = CrossEntropyLoss()
 optimizer = AdamW(model.parameters(), lr=LEARNING_RATE)

@@ -12,4 +12,3 @@ SAVE_EVERY = 5
 
 DATA_PATH = "data/input.txt"
 CHEKPOINT_PATH = "outputs/checkpoints"
-os.makedirs(CHEKPOINT_PATH, exist_ok=True)
