@@ -75,4 +75,11 @@ run = neptune.init_run(
     api_token=os.getenv("NEPTUNE_API_TOKEN"),
 )
 
+run["config/SEQ_LEN"] = SEQ_LEN
+run["config/BATCH_SIZE"] = BATCH_SIZE
+run["config/EMBED_DIM"] = EMBED_DIM
+run["config/N_HEADS"] = N_HEADS
+run["config/N_LAYERS"] = N_LAYERS
+run["config/EPOCHS"] = EPOCHS
+
 train_model(model, EPOCHS, train_loader, val_loader, loss_fn, optimizer, device, run)

@@ -9,6 +9,12 @@ env/
 .venv/
 .env/
 
+# Python egg
+*.egg
+
+# Neptune files
+.neptune/
+
 # Jupyter Notebooks checkpoints
 .ipynb_checkpoints/
 
